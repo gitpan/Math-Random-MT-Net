@@ -1,0 +1,47 @@
+#!/usr/bin/perl
+
+# Compares timings between Perl's srand/rand and Math::Random::MT::Net::rand32
+
+# Usage:  random [COUNT]
+
+use strict;
+use warnings;
+
+use Math::Random::MT::Net;
+use Time::HiRes 'time';
+
+MAIN:
+{
+    my $count = (@ARGV) ? $ARGV[0] : 100000;
+
+    my ($cnt, $ts1, $ts2, $tr1, $tr2);
+
+    $ts1 = time();
+    CORE::srand(CORE::time() + $$);
+    $ts1 = time() - $ts1;
+
+    $cnt = $count-1;
+    $tr1 = time();
+    do {
+        CORE::rand();
+    } while ($cnt--);
+    $tr1 = time() - $tr1;
+
+    $ts2 = time();
+    rand32();
+    $ts2 = time() - $ts2;
+
+    $cnt = $count-1;
+    $tr2 = time();
+    do {
+        rand32();
+    } while ($cnt--);
+    $tr2 = time() - $tr2;
+
+    printf("Timing for %s random numbers\n", $count);
+    printf("\tSRAND\t\tRAND\n");
+    printf("CORE:\t%f secs.\t%f secs.\n", $ts1, $tr1);
+    printf("MRMN:\t%f secs.\t%f secs.\n", $ts2, $tr2);
+}
+
+# EOF
